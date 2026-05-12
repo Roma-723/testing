@@ -1,14 +1,21 @@
-// components/Cart.tsx
-
-import  { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 import { useUserStore } from '../api/getProduct'
 import type { ICart } from '../types/product'
-import { useCartStore } from '../api/getBasket'
+import toast from 'react-hot-toast'
+import { IMaskInput } from 'react-imask'
+import DOMPurify from "dompurify"
 
 const Cart = () => {
 
-    const { cart, getCart } = useCartStore()
-    const { data, getUsers } = useUserStore()
+    const {
+        data,
+        getUsers,
+        deleteCart,
+        getCart,
+        cart
+    } = useUserStore()
+
+    const [phone, setPhone] = useState("")
 
     useEffect(() => {
         getCart()
@@ -16,27 +23,36 @@ const Cart = () => {
     }, [])
 
     const addedProducts = data.filter((item) =>
-        cart.some((cartItem:ICart) => cartItem.productId === item.id)
+        cart.some((cartItem: ICart) => cartItem.productId === item.id)
     )
 
-    const totalPrice = addedProducts.reduce((acc, item) => {
+    const handleOrder = () => {
 
-        const cartItem = cart.find(
-            (c:ICart) => c.productId === item.id
-        )
+        if (cart.length === 0) {
+            toast.error("Корзина пустая")
+            return
+        }
 
-        const price = item.price
+        const clearPhone = DOMPurify.sanitize(phone)
 
-        return acc + (price * (cartItem?.count || 0))
+        const numbersOnly = clearPhone.replace(/\D/g, "")
 
-    }, 0)
+        if (numbersOnly.length !== 11) {
+            toast.error("Введите номер полностью")
+            return
+        }
+
+        deleteCart()
+
+        toast.success("Заказ оформлен")
+    }
 
     return (
-        <div className='bg-[#D9D9D9]'>
+        <div className='bg-[#222222] flex justify-center  '>
 
-            <div className=''>
+            <div className='bg-[#D9D9D9] lg:w-105 w-[90%] lg:mt-5 rounded-2xl p-4'>
 
-                <h1 className='text-3xl font-bold mb-5'>
+                <h1 className='text-3xl font-bold mb-5 text-black'>
                     Добавленные товары
                 </h1>
 
@@ -44,7 +60,7 @@ const Cart = () => {
                     addedProducts.map((item) => {
 
                         const cartItem = cart.find(
-                            (c:ICart) => c.productId === item.id
+                            (c: ICart) => c.productId === item.id
                         )
 
                         const price = item.price
@@ -52,22 +68,22 @@ const Cart = () => {
                         return (
                             <div
                                 key={item.id}
-                                className=''
+                                className='flex justify-between items-center mb-2'
                             >
 
                                 <div>
 
-                                    <h1 className='text-xl font-bold'>
+                                    <h1 className='text-black text-lg'>
                                         {item.name}
                                     </h1>
 
-                                    <p className='text-lg'>
+                                    <p className='text-black text-sm'>
                                         x{cartItem?.count}
                                     </p>
 
                                 </div>
 
-                                <p className='text-2xl font-bold'>
+                                <p className='text-black text-lg'>
                                     {price * (cartItem?.count || 0)}₽
                                 </p>
 
@@ -76,29 +92,19 @@ const Cart = () => {
                     })
                 }
 
-                <div className='flex justify-between items-center mt-6 mb-6'>
+                <div className='flex flex-col lg:flex-row gap-3 mt-5'>
 
-                    <h1 className='text-2xl font-bold'>
-                        Общая сумма:
-                    </h1>
-
-                    <p className='text-3xl font-bold'>
-                        {totalPrice}₽
-                    </p>
-
-                </div>
-
-                <div className='flex gap-3 mt-5'>
-
-                    <input
-                        type="text"
-                        name="phone"
-                        placeholder='+7 (___) ___ __-__'
-                        className='bg-[#222222] text-white w-full h-12 rounded-xl px-4 placeholder:text-white outline-none'
+                    <IMaskInput
+                        mask="+7 (000) 000-00-00"
+                        value={phone}
+                        onAccept={(value) => setPhone(value)}
+                        placeholder="+7 (___) ___-__-__"
+                        className='bg-[#1E1E1E] text-white w-full h-12 rounded-xl px-4 placeholder:text-white outline-none'
                     />
 
                     <button
-                        className='bg-[#222222] text-white px-6 rounded-xl'
+                        onClick={handleOrder}
+                        className='bg-[#1E1E1E] text-white px-6 h-12 rounded-xl text-xl'
                     >
                         заказать
                     </button>
@@ -111,4 +117,4 @@ const Cart = () => {
     )
 }
 
-export default Cart 
+export default Cart

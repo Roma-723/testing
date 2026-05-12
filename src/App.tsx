@@ -1,5 +1,5 @@
+import Cart from './components/cart.tsx'
 import { Products } from './components/product'
-import Cart from './components/Cart'
 
 const App = () => {
   return (

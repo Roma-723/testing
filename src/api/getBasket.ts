@@ -7,6 +7,7 @@ import type { ICart } from "../types/product"
 interface ICartStore {
     cart: ICart[]
     getCart: () => Promise<void>
+    // deleteCart: () => Promise<void>
 }
 
 export const useCartStore = create<ICartStore>((set) => ({
@@ -21,5 +22,6 @@ export const useCartStore = create<ICartStore>((set) => ({
         } catch (error) {
             console.error(error)
         }
-    }
+    },
+
 }))

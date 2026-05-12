@@ -22,6 +22,7 @@ export interface IUseStore {
 
     getUsers: () => Promise<void>
     getCart: () => Promise<void>
+    deleteCart:()=>Promise<void>
 
     incrementCart: (productId: number) => Promise<void>
     decrementCart: (productId: number) => Promise<void>

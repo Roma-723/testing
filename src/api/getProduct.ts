@@ -4,18 +4,16 @@ import type { IData, IUseStore, ICart } from "../types/product"
 import toast from "react-hot-toast"
 
 export const useUserStore = create<IUseStore>((set, get) => ({
-     
+
     data: [],
-    cart:[],
+    cart: [],
     loading: false,
+    
 
     getUsers: async () => {
         try {
-
             const { data } = await axiosRequest.get<IData[]>('')
-
             set({ data })
-
         } catch (error) {
             console.log(error)
         }
@@ -37,7 +35,7 @@ export const useUserStore = create<IUseStore>((set, get) => ({
         try {
 
             const product = get().cart.find(
-                (item:any) => item.productId === productId
+                (item: any) => item.productId === productId
             )
 
             if (product) {
@@ -45,7 +43,9 @@ export const useUserStore = create<IUseStore>((set, get) => ({
                 await axiosCards.patch(`/${product.id}`, {
                     count: product.count + 1
                 })
+
                 toast.success('Товар добавлен')
+
             } else {
 
                 await axiosCards.post('', {
@@ -53,18 +53,23 @@ export const useUserStore = create<IUseStore>((set, get) => ({
                     count: 1
                 })
 
+                toast.success('Товар добавлен')
             }
 
-            get().getCart()
+            const updatedCart = await axiosCards.get<ICart[]>('')
+
+            set({ cart: updatedCart.data })
 
         } catch (error) {
             console.log(error)
         }
     },
+
     decrementCart: async (productId: number) => {
         try {
+
             const product = get().cart.find(
-                (item:any) => item.productId === productId
+                (item: any) => item.productId === productId
             )
 
             if (!product) return
@@ -72,20 +77,40 @@ export const useUserStore = create<IUseStore>((set, get) => ({
             if (product.count <= 1) {
 
                 await axiosCards.delete(`/${product.id}`)
+
                 toast.success('Товар успешно удален')
+
             } else {
 
                 await axiosCards.patch(`/${product.id}`, {
                     count: product.count - 1
                 })
+
                 toast.success('Товар успешно удален')
             }
 
-            get().getCart()
+            const updatedCart = await axiosCards.get<ICart[]>('')
+
+            set({ cart: updatedCart.data })
+
+        } catch (error) {
+            console.log(error)
+        }
+    },
+
+    deleteCart: async () => {
+        try {
+
+            const { data } = await axiosCards.get<ICart[]>("")
+
+            for (const item of data) {
+                await axiosCards.delete(`/${item.id}`)
+            }
+
+            set({ cart: [] })
 
         } catch (error) {
             console.log(error)
         }
     }
-
 }))

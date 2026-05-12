@@ -1,4 +1,4 @@
-import  { useEffect } from 'react'
+import { useEffect } from 'react'
 import { useUserStore } from '../api/getProduct'
 
 export const Products = () => {
@@ -20,8 +20,7 @@ export const Products = () => {
     return (
         <div className='bg-[#222222]'>
 
-            <div className='grid grid-cols-2 lg:grid-cols-3 gap-5 p-4 max-w-7xl m-auto'>
-
+            <div className='flex flex-col lg:grid lg:grid-cols-3 gap-5 p-4 max-w-7xl m-auto'>
                 {data?.map((e) => {
 
                     const product = cart.find(
